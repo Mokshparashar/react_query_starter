@@ -2,17 +2,25 @@ import SingleItem from "./SingleItem";
 import customSetup from "./axios/utils";
 import { useQuery } from "@tanstack/react-query";
 const Items = () => {
-  const { isLoading, data } = useQuery({
+  const { isLoading, data, isError, error } = useQuery({
     queryKey: ["tasks"],
-    queryFn: () => customSetup.get("/"),
+    queryFn: async () => {
+      const { data } = await customSetup.get("/");
+      return data;
+    },
   });
-  const maindata = data.data.taskList;
+  console.log(data);
+
   if (isLoading) {
     return <h1>Loading...</h1>;
   }
+  if (isError) {
+    return <h3>{error.response.data}</h3>;
+  }
+  const mainData = data.taskList;
   return (
     <div className="items">
-      {maindata.map((item) => {
+      {mainData.map((item) => {
         return <SingleItem {...item} key={item.id} />;
       })}
     </div>
